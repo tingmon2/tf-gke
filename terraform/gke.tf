@@ -1,5 +1,6 @@
 module "gke" {
-  depends_on = [google_service_account.gke-sa, google_project_service.kubernetes, google_project_service.compute, google_project_service.iam]
+  // depends_on = [google_service_account.gke-sa, google_project_service.kubernetes, google_project_service.compute, google_project_service.iam]
+  depends_on = [google_project_service.kubernetes, google_project_service.compute, google_project_service.iam]
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster"
   version                    = "19.0.0"
   project_id                 = var.gcp_project_id
