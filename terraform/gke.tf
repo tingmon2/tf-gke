@@ -9,8 +9,8 @@ module "gke" {
   ip_range_pods              = "" // auto assign
   ip_range_services          = "" // auto assign
   zones                      = var.gke_zones // asia-northeast3-a
-  network                    = google_compute_network.vpc.name // default
-  subnetwork                 = google_compute_subnetwork.subnet.name // default
+  network                    = data.google_compute_network.vpc.name // default
+  subnetwork                 = data.google_compute_subnetwork.subnet.name // default
   http_load_balancing        = true
   horizontal_pod_autoscaling = true // pod autoscaling
   network_policy             = false

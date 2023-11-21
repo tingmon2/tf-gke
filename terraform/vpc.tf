@@ -10,6 +10,8 @@
 #   ip_cidr_range = "10.10.0.0/24"
 # }
 
+// 새로운 vpc와 subnet 만들지 말고 기존 네트워크 사용
+
 data "google_compute_network" "vpc" {
   name    = var.gke_network
   project = var.gcp_project_id
