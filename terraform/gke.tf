@@ -17,9 +17,9 @@ module "gke" {
   remove_default_node_pool   = true
   create_service_account = false
   logging_service = "none"
-  network_interface {
-    subnetwork = data.google_compute_subnetwork.subnet-for-vms
-  }
+  # network_interface {
+  #   subnetwork = data.google_compute_subnetwork.subnet-for-vms
+  # }
   node_pools = [
     {
       name               = var.gke_default_nodepool_name
