@@ -176,7 +176,7 @@ resource "kubernetes_config_map" "daemonset_config_map" {
   }
 
   data = {
-    "script.sh" = var.init_script
+    "entrypoint.sh" = var.init_script
   }
 }
 
@@ -201,12 +201,22 @@ resource "kubernetes_daemonset" "clari_app_daemonset" {
 
       spec {
         init_container {
-          name  = "init-container"
-          image = "busybox"
-          command = [ "sh", "-c", "/var/lib/scripts/script.sh" ]
+          name  = "node-initializer"
+          image = "ubuntu:18.04"
+          command = [ "/scripts/entrypoint.sh" ]
+
           volume_mount {
             name      = "config-volume"
-            mount_path = "/var/lib/scripts"
+            mount_path = "/scripts"
+          }
+
+          volume_mount {
+            name      = "root-mount"
+            mount_path = "/root"
+          }
+
+          security_context {
+            privileged = true
           }
         }
 
@@ -219,6 +229,14 @@ resource "kubernetes_daemonset" "clari_app_daemonset" {
           name = "config-volume"
           config_map {
             name = kubernetes_config_map.daemonset_config_map.metadata[0].name
+            default_mode = "0744"
+          }
+        }
+
+        volume {
+          name = "root-mount"
+          host_path {
+            path = "/"
           }
         }
       }
