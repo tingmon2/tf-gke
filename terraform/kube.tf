@@ -15,7 +15,7 @@ resource "kubernetes_secret" "clari_app_secret" {
 }
 
 resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
-  depends_on = [kubernetes_deployment.clari_app_deployment]
+  // depends_on = [kubernetes_deployment.clari_app_deployment]
   metadata {
     name = "clari-app-pv"
   }
