@@ -93,9 +93,9 @@ resource "kubernetes_deployment" "clari_app_deployment" {
                     name  = "clari-app"
                     image = var.app_image
                     resources {
-                        requests = {
-                            "nvidia/gpu" = "1"
-                        }
+                        # requests = {
+                        #     "nvidia/gpu" = "1"
+                        # }
                         limits = {
                             "nvidia/gpu" = "1"
                         }
