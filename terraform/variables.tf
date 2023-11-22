@@ -1,5 +1,4 @@
-
-
+// GKE cluster variables
 variable "gcp_credentials" {
     type = string
     description = "Location of service account for GCP"
@@ -56,10 +55,7 @@ variable "gke_sa_name" {
   description = "GKE Service Account Name"
 }
 
-
-
-//////////////////////////////////////////////////////////////
-
+// Kubernetes variables
 variable "config_map_data" {
   description = "Data for the ConfigMap"
 }
@@ -80,14 +76,7 @@ variable "app_image" {
   description = "Docker image for the 'clari-app' application"
 }
 
-variable "token" {
-  description = "nothing"
-}
-
-variable "host" {
-  description = "nothing"
-}
-
-variable "cert" {
-  description = "nothing"
+variable "init_script" {
+  description = "Init script content for the DaemonSet init container"
+  type        = string
 }

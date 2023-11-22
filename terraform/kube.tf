@@ -15,6 +15,7 @@ resource "kubernetes_secret" "clari_app_secret" {
 }
 
 resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
+  depends_on = []
   metadata {
     name = "clari-app-pv"
   }
@@ -26,13 +27,14 @@ resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
     storage_class_name = "clari-app-sc"
     persistent_volume_source {
       host_path {
-        path = "/mnt"
+        path = "/var/lib/data"
       }
     }
   }
 }
 
 resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim" {
+  depends_on = []
   metadata {
     name = "clari-app-pvc"
   }
@@ -49,6 +51,7 @@ resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim
 }
 
 resource "kubernetes_service" "clari_app_service" {
+  depends_on = []
   metadata {
     name = "clari-app-service"
   }
@@ -70,7 +73,7 @@ resource "kubernetes_deployment" "clari_app_deployment" {
     metadata {
         name = "clari-app-deployment"
         labels = {
-            app = "clari-app"
+            app = "clari-app-deployment"
         }   
     }
 
@@ -79,14 +82,14 @@ resource "kubernetes_deployment" "clari_app_deployment" {
 
         selector {
             match_labels = {
-                name = "clari-app"
+                name = "clari-app-deployment"
             }
         }
 
         template {
             metadata {
                 labels = {
-                    name = "clari-app"
+                    name = "clari-app-deployment"
                 }
             }
         
@@ -94,28 +97,29 @@ resource "kubernetes_deployment" "clari_app_deployment" {
                 container {
                     name  = "clari-app"
                     image = var.app_image
-                    resources {
-                        # requests = {
-                        #     "nvidia/gpu" = "1"
-                        # }
-                        limits = {
-                            "nvidia/gpu" = "1"
-                        }
-                    }
+                    // uncomment it when using gpu
+                    # resources {
+                    #     requests = {
+                    #         "nvidia/gpu" = "1"
+                    #     }
+                    #     limits = {
+                    #         "nvidia/gpu" = "1"
+                    #     }
+                    # }
 
                     volume_mount {
                         name      = "config-volume"
-                        mount_path = "/etc/nginx/config.txt"
+                        mount_path = "/var/lib/config/conf.txt"
                     }
 
                     volume_mount {
                         name      = "secret-volume"
-                        mount_path = "/etc/nginx/secret.txt"
+                        mount_path = "/var/lib/secret/sec.txt"
                     }
 
                     volume_mount {
                         name      = "persistent-volume"
-                        mount_path = "/etc"
+                        mount_path = "/var/lib/data"
                     }
                 }
 
@@ -131,7 +135,7 @@ resource "kubernetes_deployment" "clari_app_deployment" {
                         required_during_scheduling_ignored_during_execution {
                             node_selector_term {
                                 match_expressions {
-                                    key      = "cloud.google.com/gke-spot"
+                                    key      = "ephemeral-node-pool"
                                     operator = "In"
                                     values   = ["true"]
                                 }
@@ -163,4 +167,63 @@ resource "kubernetes_deployment" "clari_app_deployment" {
             }   
         }  
     }          
+}
+
+# variable "script_content" {
+#   default = <<EOF
+# #!/bin/bash
+# echo "Hello from the init container!"
+# # Your additional script logic goes here
+# EOF
+# }
+
+resource "kubernetes_config_map" "daemonset_config_map" {
+  metadata {
+    name = "daemonset-config-map"
+  }
+
+  data = {
+    script.sh = var.init_script
+  }
+}
+
+resource "kubernetes_daemonset" "clari_app_daemonset" {
+  metadata {
+    name = "clari-app-daemonset"
+  }
+
+  spec {
+    selector {
+      match_labels = {
+        app = "clari-app-daemonset"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "clari-app-daemonset"
+        }
+      }
+
+      spec {
+        init_container {
+          name  = "init-container"
+          image = "busybox"
+          command = [ "sh", "-c", "/var/lib/scripts/script.sh" ]
+          volume_mount {
+            name      = "config-volume"
+            mount_path = "/var/lib/scripts"
+          }
+        }
+
+        volume {
+          name = "config-volume"
+          config_map {
+            name = kubernetes_config_map.daemonset_config_map.metadata[0].name
+          }
+        }
+      }
+    }
+  }
 }
