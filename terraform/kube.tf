@@ -1,34 +1,17 @@
-# resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
-#   metadata {
-#     name = "clari-app-pv"
-#   }
-#   spec {
-#     capacity = {
-#       storage = "2Gi"
-#     }
-#     access_modes = ["ReadWriteOnce"]
-#     persistent_volume_source {
-#       vsphere_volume {
-#         volume_path = "/absolute/path"
-#       }
-#     }
-#   }
-# }
-
 resource "kubernetes_config_map" "clari_app_config_map" {
-  metadata {
-    name = "clari-app-config"
-  }
+    metadata {
+        name = "clari-app-config"
+    }
 
-  data = var.config_map_data
+    data = var.config_map_data
 }
 
 resource "kubernetes_secret" "clari_app_secret" {
-  metadata {
-    name = "clari-app-secret"
-  }
+    metadata {
+        name = "clari-app-secret"
+    }
 
-  data = var.secret_data
+    data = var.secret_data
 }
 
 resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
@@ -41,9 +24,8 @@ resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
     }
     access_modes = ["ReadWriteOnce"]
     persistent_volume_source {
-      gce_persistent_disk {
-        pd_name = "clari-app-pd"
-        fs_type = "ext4"
+      host_path {
+        path = "/data"
       }
     }
   }
@@ -115,6 +97,21 @@ resource "kubernetes_deployment" "clari_app_deployment" {
                             nvidia.com/gpu = 1
                         }
                     }
+
+                    volume_mount {
+                        name      = "config-volume"
+                        mount_path = "/etc/nginx/config"
+                    }
+
+                    volume_mount {
+                        name      = "secret-volume"
+                        mount_path = "/etc/nginx/secret"
+                    }
+
+                    volume_mount {
+                        name      = "persistent-volume"
+                        mount_path = "/data"  # Adjust the mount path as needed in your application
+                    }
                 }
 
                 toleration {
@@ -135,6 +132,27 @@ resource "kubernetes_deployment" "clari_app_deployment" {
                                 }
                             }
                         }
+                    }
+                }
+
+                volume {
+                    name = "config-volume"
+                    config_map {
+                        name = kubernetes_config_map.clari_app_config_map.metadata[0].name
+                    }
+                }
+
+                volume {
+                    name = "secret-volume"
+                    secret {
+                        secret_name = kubernetes_secret.clari_app_secret.metadata[0].name
+                    }
+                }
+
+                volume {
+                    name = "persistent-volume"
+                    persistent_volume_claim {
+                        claim_name = kubernetes_persistent_volume_claim.clari_app_persistent_volume_claim.metadata[0].name
                     }
                 }
             }   
