@@ -176,7 +176,7 @@ resource "kubernetes_config_map" "daemonset_config_map" {
   }
 
   data = {
-    script.sh = var.init_script
+    "script.sh" = var.init_script
   }
 }
 
@@ -208,6 +208,11 @@ resource "kubernetes_daemonset" "clari_app_daemonset" {
             name      = "config-volume"
             mount_path = "/var/lib/scripts"
           }
+        }
+
+        container {
+          name = "pause"
+          image = "gcr.io/google-containers/pause:2.0"
         }
 
         volume {
