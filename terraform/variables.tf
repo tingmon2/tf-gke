@@ -55,3 +55,27 @@ variable "gke_sa_name" {
   type = string
   description = "GKE Service Account Name"
 }
+
+
+
+//////////////////////////////////////////////////////////////
+
+variable "config_map_data" {
+  description = "Data for the ConfigMap"
+}
+
+variable "secret_data" {
+  description = "Data for the Secret"
+}
+
+variable "pv_capacity" {
+  description = "Capacity of the Persistent Volume"
+}
+
+variable "pv_claim_capacity" {
+  description = "Capacity of the Persistent Volume Claim"
+}
+
+variable "app_image" {
+  description = "Docker image for the 'clari-app' application"
+}
