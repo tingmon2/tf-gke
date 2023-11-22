@@ -23,6 +23,7 @@ resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
       storage = var.pv_capacity
     }
     access_modes = ["ReadWriteOnce"]
+    storage_class_name = "clari-app-sc"
     persistent_volume_source {
       host_path {
         path = "/mnt"
@@ -43,7 +44,7 @@ resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim
         storage = var.pv_claim_capacity
       }
     }
-    volume_name = "${kubernetes_persistent_volume.clari_app_persistent_volume.metadata.0.name}"
+    storage_class_name = "clari-app-sc"
   }
 }
 
@@ -104,17 +105,17 @@ resource "kubernetes_deployment" "clari_app_deployment" {
 
                     volume_mount {
                         name      = "config-volume"
-                        mount_path = "/etc/nginx/config"
+                        mount_path = "/etc/nginx/config.txt"
                     }
 
                     volume_mount {
                         name      = "secret-volume"
-                        mount_path = "/etc/nginx/secret"
+                        mount_path = "/etc/nginx/secret.txt"
                     }
 
                     volume_mount {
                         name      = "persistent-volume"
-                        mount_path = "/etc/nginx"  # Adjust the mount path as needed in your application
+                        mount_path = "/etc"
                     }
                 }
 
