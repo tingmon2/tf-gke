@@ -21,6 +21,15 @@ module "gke" {
   # network_interface {
   #   subnetwork = data.google_compute_subnetwork.subnet-for-vms
   # }
+  output "cluster_endpoint" {
+    value = ""
+  }
+  output "cluster_ca_certificate" {
+    value = ""
+  }
+  output "access_token" {
+    value = ""
+  }
   node_pools = [
     {
       name               = var.gke_default_nodepool_name

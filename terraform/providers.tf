@@ -16,9 +16,9 @@ provider "google-beta" {
 }
 
 provider "kubernetes" {
-  host = "https://${module.gke.cluster_endpoint}"  # Replace with your GKE cluster endpoint
-  token = module.gke.access_token  # Replace with your service account token
-  cluster_ca_certificate = base64encode(module.gke.cluster_ca_certificate)
+  host = "https://${module.gke.endpoint}"  # Replace with your GKE cluster endpoint
+  token = data.google_client_config.default.access_token  # Replace with your service account token
+  cluster_ca_certificate = base64encode(module.gke.ca_certificate)
 
   config_context = "gpu-cluster"
 }
