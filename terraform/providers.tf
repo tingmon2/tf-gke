@@ -16,11 +16,11 @@ provider "google-beta" {
 }
 
 provider "kubernetes" {
-  // config_path = "~/.kube/config"  # Specify the path to your kubeconfig file
-  config_context_auth_info = {
-    cluster = "gpu-cluster"
-    user = "gke-admin"
-  }
+  host = "https://${module.gke.cluster_endpoint}"  # Replace with your GKE cluster endpoint
+  token = module.gke.access_token  # Replace with your service account token
+  cluster_ca_certificate = base64encode(module.gke.cluster_ca_certificate)
+
+  config_context = "gpu-cluster"
 }
 
 

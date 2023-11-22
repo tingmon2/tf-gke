@@ -79,3 +79,15 @@ variable "pv_claim_capacity" {
 variable "app_image" {
   description = "Docker image for the 'clari-app' application"
 }
+
+variable "token" {
+  description = "nothing"
+}
+
+variable "host" {
+  description = "nothing"
+}
+
+variable "cert" {
+  description = "nothing"
+}

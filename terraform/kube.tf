@@ -110,7 +110,7 @@ resource "kubernetes_deployment" "clari_app_deployment" {
 
                     volume_mount {
                         name      = "persistent-volume"
-                        mount_path = "/data"  # Adjust the mount path as needed in your application
+                        mount_path = "/etc/nginx"  # Adjust the mount path as needed in your application
                     }
                 }
 
