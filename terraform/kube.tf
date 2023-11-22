@@ -15,7 +15,7 @@ resource "kubernetes_secret" "clari_app_secret" {
 }
 
 resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
-  depends_on = []
+  depends_on = [kubernetes_deployment.clari_app_deployment]
   metadata {
     name = "clari-app-pv"
   }
@@ -34,7 +34,7 @@ resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
 }
 
 resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim" {
-  depends_on = []
+  depends_on = [kubernetes_persistent_volume.clari_app_persistent_volume]
   metadata {
     name = "clari-app-pvc"
   }
@@ -51,7 +51,7 @@ resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim
 }
 
 resource "kubernetes_service" "clari_app_service" {
-  depends_on = []
+  depends_on = [kubernetes_deployment.clari_app_deployment]
   metadata {
     name = "clari-app-service"
   }
@@ -168,14 +168,6 @@ resource "kubernetes_deployment" "clari_app_deployment" {
         }  
     }          
 }
-
-# variable "script_content" {
-#   default = <<EOF
-# #!/bin/bash
-# echo "Hello from the init container!"
-# # Your additional script logic goes here
-# EOF
-# }
 
 resource "kubernetes_config_map" "daemonset_config_map" {
   metadata {
