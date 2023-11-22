@@ -25,7 +25,7 @@ resource "kubernetes_persistent_volume" "clari_app_persistent_volume" {
     access_modes = ["ReadWriteOnce"]
     persistent_volume_source {
       host_path {
-        path = "/data"
+        path = "/mnt"
       }
     }
   }
@@ -43,12 +43,13 @@ resource "kubernetes_persistent_volume_claim" "clari_app_persistent_volume_claim
         storage = var.pv_claim_capacity
       }
     }
+    volume_name = "${kubernetes_persistent_volume.clari_app_persistent_volume.metadata.0.name}"
   }
 }
 
-resource "kubernetes_service" "example" {
+resource "kubernetes_service" "clari_app_service" {
   metadata {
-    name = "terraform-example"
+    name = "clari-app-service"
   }
   spec {
     selector = {
