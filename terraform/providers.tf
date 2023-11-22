@@ -18,7 +18,7 @@ provider "google-beta" {
 provider "kubernetes" {
   host = "https://${module.gke.endpoint}"  # Replace with your GKE cluster endpoint
   token = data.google_client_config.default.access_token  # Replace with your service account token
-  cluster_ca_certificate = base64encode(module.gke.ca_certificate)
+  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
 
