@@ -202,7 +202,7 @@ resource "kubernetes_daemonset" "clari_app_daemonset" {
       spec {
         init_container {
           name  = "node-initializer"
-          image = "ubuntu:18.04"
+          image = "ubuntu:20.04"
           command = [ "/scripts/entrypoint.sh" ]
 
           volume_mount {
